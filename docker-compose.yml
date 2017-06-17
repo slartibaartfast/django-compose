@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=composetest
+      - MYSQL_PASSWORD=testpassword
+      - MYSQL_DATABASE=composetest
+  web:
+    build: .
+    command: bash -c "python check_db.py --service-name mysql --ip db --port 3306 &&
+                      python manage.py migrate &&
+                      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
